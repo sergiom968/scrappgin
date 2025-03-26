@@ -4,6 +4,7 @@ let _supabase = null
 let pacientes = []
 const filtros = ['ASPARTATO', 'ALANINO', 'BILIRRUBINA', 'FOSFATASA', 'HEMOGLOBINA']
 let indiceDocumento = 0
+let filtros_activos = false
 
 async function iniciar(){
 	// Añade la libreria moment.js
@@ -31,26 +32,26 @@ async function iniciar(){
 	XMLHttpRequest.prototype.open = function (...args) {
 		this.addEventListener('load', function () {
 			/* 
-				Función que maneja las interceptaciones
-				@responseText(respuesta en formato dexto de la interceptación)
+			 *	Función que maneja las interceptaciones
+			 *	responseText(respuesta en formato dexto de la interceptación)
 			*/
 			condicion(this.responseText)
 		})
 		originalXhrOpen.apply(this, args);
 	}
 	
-	/*
-		Inicializa los componentes de la fecha inicial en variables
-		@fechaInicio corresponde al input visible
-		@hfechaInicio corresponde al input oculto
-	*/
+	/**
+	 * Inicializa los componentes de la fecha inicial en variables
+	 * fechaInicio corresponde al input visible
+	 * hfechaInicio corresponde al input oculto
+	 */
 	fechaInicio = document.querySelector('#CurFecha_dateInput')
 	hfechaInicio = document.querySelector('#CurFecha_dateInput_ClientState')
 
-	/*
-		Inicializa los componentes de la fecha inicial en variables
-		@fechaFin corresponde al input visible
-		@hfechaFin corresponde al input oculto
+	/**
+	 *	Inicializa los componentes de la fecha inicial en variables
+	 *	fechaFin corresponde al input visible
+	 *	hfechaFin corresponde al input oculto
 	*/
 	fechaFin = document.querySelector('#CurFechaE_dateInput')
 	hfechaFin = document.querySelector('#CurFechaE_dateInput_ClientState')
@@ -126,7 +127,9 @@ async function condicion(responseText){
 		filas.forEach((fila) => {
 			if (fila.className != 'rgGroupHeader'){
 				const laboratorio = fila.childNodes[3].textContent
-				//if(!filtros.some(filtro => laboratorio.includes(filtro))) return false // Aplica los filtros de los paraclínicos
+				if (filtros_activos){
+					if(!filtros.some(filtro => laboratorio.includes(filtro))) return false // Aplica los filtros de los paraclínicos
+				}
 				const val_ref = fila.childNodes[5].textContent.split('   -   ')
 				const fecha = `${moment(orden.slice(0,8)).format('YYYY-MM-DD')}`
 				n_filas.push({
